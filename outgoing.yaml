@@ -5,7 +5,7 @@ info:
   license:
     name: MIT
 paths:
-  /apis/services/outgoing:
+  /apis/services/outgoing/requests:
     get:
       tags:
         - admin-outgoing
@@ -46,10 +46,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Result'
-  /apis/services/outgoing/apply:
     post:
       tags:
-        - user-outgoing
+        - admin-outgoing
       summary: '유저가 놀러가기 서비스 신청합니다.'
       description: '유저가 놀러가기 서비스 신청합니다.'
       operationId: 'applyOutgoing'
@@ -127,7 +126,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Result'
-  /apis/services/outgoing/confirm:
+  /apis/services/outgoing/confirms:
     post:
       tags:
         - admin-outgoing
@@ -167,6 +166,46 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Result'
+
+    delete:
+      tags:
+        - admin-outgoing
+      summary: '승인된 놀러가기를 취소 처리 합니다.'
+      description: '승인된 놀러가기를 취소 처리 합니다.'
+      operationId: 'cancel'
+      parameters:
+        - in: query
+          name: v
+          description: version
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: couponId
+          description: couponId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: '데이터 전송 성공'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+        '400':
+          description: '입력이 유효하지 않습니다'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+        '500':
+          description: '시스템 에러가 발생했습니다'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+
 components:
   schemas:
     OutgoingServiceRequest:
@@ -197,7 +236,6 @@ components:
       required:
         - username
         - clubname
-        - outgoing-coupons
       properties:
         username:
           type: string
@@ -205,10 +243,6 @@ components:
         clubname:
           type: string
           example: '북씨-XX'
-        outgoing-coupons:
-          type: array
-          items:
-            $ref: '#/components/schemas/OutgoingCoupon'
     Result:
       type: 'object'
       required:
