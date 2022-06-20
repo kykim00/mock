@@ -1,0 +1,236 @@
+openapi: '3.0.0'
+info:
+  version: 1.0.0
+  title: notification
+  license:
+    name: MIT
+paths:
+  /apis/services/outgoing:
+    get:
+      tags:
+        - admin-outgoing
+      summary: '유저가 신청한 놀러가기 서비스를 확인합니다.'
+      description: '유저가 신청한 놀러가기 서비스를 확인합니다.'
+      operationId: 'getOutgoingServices'
+      parameters:
+        - in: query
+          name: userId
+          description: userId
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: v
+          description: version
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: '데이터 전송 성공'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Outgoing'
+        '400':
+          description: '입력이 유효하지 않습니다'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+        '500':
+          description: '시스템 에러가 발생했습니다'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+  /apis/services/outgoing/apply:
+    post:
+      tags:
+        - user-outgoing
+      summary: '유저가 놀러가기 서비스 신청합니다.'
+      description: '유저가 놀러가기 서비스 신청합니다.'
+      operationId: 'applyOutgoing'
+      parameters:
+        - in: query
+          name: v
+          description: version
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: 'apply outgoingservice by user'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OutgoingServiceRequest'
+      responses:
+        '200':
+          description: '신청에 성공했습니다.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+        '400':
+          description: '입력이 유효하지 않습니다'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+        '500':
+          description: '시스템 에러가 발생했습니다'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+  /apis/services/outgoing/coupons:
+    get:
+      tags:
+        - user-outgoing
+      summary: '유저의 사용가능한 무료 놀러가기 쿠폰을 조회합니다.'
+      description: '유저의 사용가능한 무료 놀러가기 쿠폰을 조회합니다.'
+      operationId: 'getOutgoingCoupons'
+      parameters:
+        - in: query
+          name: userId
+          description: userId
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: v
+          description: version
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: '유저의 사용가능한 무료 놀러가기 쿠폰을 조회합니다'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OutgoingCoupon'
+        '400':
+          description: '입력이 유효하지 않습니다'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+        '500':
+          description: '시스템 에러가 발생했습니다'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+  /apis/services/outgoing/confirm:
+    post:
+      tags:
+        - admin-outgoing
+      summary: '승인된 놀러가기를 최종확인 처리 합니다.'
+      description: '승인된 놀러가기를 최종확인 처리 합니다.'
+      operationId: 'confirm'
+      parameters:
+        - in: query
+          name: v
+          description: version
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: 'apply outgoingservice by user'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OutgoingServiceConfirmRequest'
+      responses:
+        '200':
+          description: '데이터 전송 성공'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+        '400':
+          description: '입력이 유효하지 않습니다'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+        '500':
+          description: '시스템 에러가 발생했습니다'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+components:
+  schemas:
+    OutgoingServiceRequest:
+      type: object
+      properties:
+        userId:
+          type: string
+          example: userUd
+        meetingId:
+          type: string
+          example: 1234
+    OutgoingCoupon:
+      type: object
+      required:
+        - id
+        - endedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: d290f1ee-6c54-4b01-90e6-d701748f0851
+        endedAt:
+          type: string
+          format: date-time
+          example: '2016-08-29T09:12:33.001Z'
+    Outgoing:
+      type: object
+      required:
+        - username
+        - clubname
+        - outgoing-coupons
+      properties:
+        username:
+          type: string
+          example: kykim
+        clubname:
+          type: string
+          example: '북씨-XX'
+        outgoing-coupons:
+          type: array
+          items:
+            $ref: '#/components/schemas/OutgoingCoupon'
+    Result:
+      type: 'object'
+      required:
+        - value
+      properties:
+        code:
+          type: 'string'
+          example: ''
+        msg:
+          type: 'string'
+          example: ''
+    OutgoingServiceConfirmRequest:
+      type: 'object'
+      properties:
+        outgoingserviceId:
+          type: integer
+          example: 1267512764128
+        paymentType:
+          type: string
+          example: '현장결제 / 쿠폰 / 사용하지 않음'
+        usedCoupon:
+          $ref: '#/components/schemas/OutgoingCoupon'
+        paymentPrice:
+          type: integer
+          example: 0
