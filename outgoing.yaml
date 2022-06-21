@@ -1,14 +1,14 @@
 openapi: '3.0.0'
 info:
   version: 1.0.0
-  title: notification
+  title: outgoing-service
   license:
     name: MIT
 paths:
   /apis/services/outgoing/requests:
     get:
       tags:
-        - admin-outgoing
+        - outgoing-coupons
       summary: '유저가 신청한 놀러가기 서비스를 확인합니다.'
       description: '유저가 신청한 놀러가기 서비스를 확인합니다.'
       operationId: 'getOutgoingServices'
@@ -48,7 +48,7 @@ paths:
                 $ref: '#/components/schemas/Result'
     post:
       tags:
-        - admin-outgoing
+        - outgoing-coupons
       summary: '유저가 놀러가기 서비스 신청합니다.'
       description: '유저가 놀러가기 서비스 신청합니다.'
       operationId: 'applyOutgoing'
@@ -85,10 +85,90 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Result'
+  /apis/services/outgoing/approve:
+    put:
+      tags:
+        - outgoing-coupons
+      summary: '유저가 신청한 놀러가기 서비스를 승인합니다.'
+      description: '유저가 신청한 놀러가기 서비스를 승인합니다.'
+      operationId: 'approve'
+      parameters:
+        - in: query
+          name: v
+          description: version
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: 'apply outgoingservice by user'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OutgoingServiceRequest'
+      responses:
+        '200':
+          description: '신청에 성공했습니다.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+        '400':
+          description: '입력이 유효하지 않습니다'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+        '500':
+          description: '시스템 에러가 발생했습니다'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+  /apis/services/outgoing/reject:
+    put:
+      tags:
+        - outgoing-coupons
+      summary: '유저가 신청한 놀러가기 서비스가 실패할 경우 사용됩니다.'
+      description: '유저가 신청한 놀러가기 서비스가 실패할 경우 사용됩니다.'
+      operationId: 'reject'
+      parameters:
+        - in: query
+          name: v
+          description: version
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: 'apply outgoingservice by user'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OutgoingServiceRequest'
+      responses:
+        '200':
+          description: '신청에 성공했습니다.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+        '400':
+          description: '입력이 유효하지 않습니다'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+        '500':
+          description: '시스템 에러가 발생했습니다'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
   /apis/services/outgoing/coupons:
     get:
       tags:
-        - user-outgoing
+        - outgoing-coupons
       summary: '유저의 사용가능한 무료 놀러가기 쿠폰을 조회합니다.'
       description: '유저의 사용가능한 무료 놀러가기 쿠폰을 조회합니다.'
       operationId: 'getOutgoingCoupons'
@@ -129,7 +209,7 @@ paths:
   /apis/services/outgoing/confirms:
     post:
       tags:
-        - admin-outgoing
+        - outgoing-coupons
       summary: '승인된 놀러가기를 최종확인 처리 합니다.'
       description: '승인된 놀러가기를 최종확인 처리 합니다.'
       operationId: 'confirm'
@@ -166,10 +246,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Result'
-
     delete:
       tags:
-        - admin-outgoing
+        - outgoing-coupons
       summary: '승인된 놀러가기를 취소 처리 합니다.'
       description: '승인된 놀러가기를 취소 처리 합니다.'
       operationId: 'cancel'
@@ -181,7 +260,7 @@ paths:
           schema:
             type: string
         - in: query
-          name: couponId
+          name: outgoingServiceId
           description: couponId
           required: true
           schema:
@@ -205,7 +284,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Result'
-
 components:
   schemas:
     OutgoingServiceRequest:
@@ -213,7 +291,7 @@ components:
       properties:
         userId:
           type: string
-          example: userUd
+          example: userId
         meetingId:
           type: string
           example: 1234
@@ -221,32 +299,40 @@ components:
       type: object
       required:
         - id
-        - endedAt
+        - expiredAt
         - state
       properties:
         id:
           type: string
           format: uuid
           example: d290f1ee-6c54-4b01-90e6-d701748f0851
-        endedAt:
+        expiredAt:
           type: string
           format: date-time
           example: '2016-08-29T09:12:33.001Z'
         state:
           type: string
-          example: 'available'
+          example: 'AVAILIABLE'
     Outgoing:
       type: object
       required:
-        - username
-        - clubname
+        - userId
+        - meetingId
+        - serviceId
+        - state
       properties:
-        username:
+        serviceId:
           type: string
-          example: kykim
-        clubname:
+          example: 'serviceId'
+        userId:
           type: string
-          example: '북씨-XX'
+          example: 'kykim'
+        meetingId:
+          type: string
+          example: 'meetingId'
+        state:
+          type: string
+          example: 'REJECTED'
     Result:
       type: 'object'
       required:
@@ -262,13 +348,14 @@ components:
       type: 'object'
       properties:
         outgoingserviceId:
-          type: integer
+          type: string
           example: 1267512764128
         paymentType:
           type: string
-          example: '현장결제 / 쿠폰 / 사용하지 않음'
-        usedCoupon:
-          $ref: '#/components/schemas/OutgoingCoupon'
+          example: '현장결제 / 쿠폰'
+        usedCouponId:
+          type: string
+          example: '123124213'
         paymentPrice:
           type: integer
           example: 0
