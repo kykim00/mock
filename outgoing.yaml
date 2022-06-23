@@ -233,7 +233,8 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/OutgoingCoupon'
+                  type: string
+                example: []
         '400':
           description: '입력이 유효하지 않습니다'
           content:
