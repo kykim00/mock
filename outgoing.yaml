@@ -1,6 +1,6 @@
 openapi: '3.0.0'
 info:
-  version: 1.0.0
+  version: 1.0.1
   title: outgoing-service
   license:
     name: MIT
@@ -52,6 +52,46 @@ paths:
       summary: '유저가 놀러가기 서비스 신청합니다.'
       description: '유저가 놀러가기 서비스 신청합니다.'
       operationId: 'applyOutgoing'
+      parameters:
+        - in: query
+          name: v
+          description: version
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: 'apply outgoingservice by user'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OutgoingServiceRequest'
+      responses:
+        '200':
+          description: '신청에 성공했습니다.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+        '400':
+          description: '입력이 유효하지 않습니다'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+        '500':
+          description: '시스템 에러가 발생했습니다'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+  /apis/services/outgoing/cancel:
+    put:
+      tags:
+        - outgoing-coupons
+      summary: '유저가 신청한 놀러가기 서비스를 취소합니다.'
+      description: '유저가 신청한 놀러가기 서비스를 취소합니다.'
+      operationId: 'cancelOutgoing'
       parameters:
         - in: query
           name: v
@@ -246,6 +286,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Result'
+
     delete:
       tags:
         - outgoing-coupons
@@ -284,6 +325,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Result'
+
 components:
   schemas:
     OutgoingServiceRequest:
@@ -295,6 +337,7 @@ components:
         meetingId:
           type: string
           example: 1234
+
     OutgoingCoupon:
       type: object
       required:
@@ -304,8 +347,7 @@ components:
       properties:
         id:
           type: string
-          format: uuid
-          example: d290f1ee-6c54-4b01-90e6-d701748f0851
+          example: 12312478
         expiredAt:
           type: string
           format: date-time
@@ -318,8 +360,6 @@ components:
       required:
         - userId
         - meetingId
-        - serviceId
-        - state
       properties:
         serviceId:
           type: string
@@ -333,6 +373,7 @@ components:
         state:
           type: string
           example: 'REJECTED'
+
     Result:
       type: 'object'
       required:
@@ -355,7 +396,7 @@ components:
           example: '현장결제 / 쿠폰'
         usedCouponId:
           type: string
-          example: '123124213'
+          example: '12312427713'
         paymentPrice:
           type: integer
           example: 0
