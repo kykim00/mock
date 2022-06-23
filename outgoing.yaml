@@ -231,7 +231,9 @@ paths:
           content:
             application/json:
               schema:
-                type: []
+                type: array
+                items:
+                  $ref: '#/components/schemas/OutgoingCoupon'
         '400':
           description: '입력이 유효하지 않습니다'
           content:
