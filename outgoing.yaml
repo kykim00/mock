@@ -231,7 +231,7 @@ paths:
           content:
             application/json:
               schema:
-                type: null
+                type: []
         '400':
           description: '입력이 유효하지 않습니다'
           content:
