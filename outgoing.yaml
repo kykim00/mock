@@ -8,7 +8,7 @@ paths:
   /apis/services/outgoing/requests:
     get:
       tags:
-        - outgoing-coupons
+        - outgoing-voucher
       summary: '유저가 신청한 놀러가기 서비스를 확인합니다.'
       description: '유저가 신청한 놀러가기 서비스를 확인합니다.'
       operationId: 'getOutgoingServices'
@@ -48,7 +48,7 @@ paths:
                 $ref: '#/components/schemas/Result'
     post:
       tags:
-        - outgoing-coupons
+        - outgoing-voucher
       summary: '유저가 놀러가기 서비스 신청합니다.'
       description: '유저가 놀러가기 서비스 신청합니다.'
       operationId: 'applyOutgoing'
@@ -88,7 +88,7 @@ paths:
   /apis/services/outgoing/cancel:
     put:
       tags:
-        - outgoing-coupons
+        - outgoing-voucher
       summary: '유저가 신청한 놀러가기 서비스를 취소합니다.'
       description: '유저가 신청한 놀러가기 서비스를 취소합니다.'
       operationId: 'cancelOutgoing'
@@ -128,7 +128,7 @@ paths:
   /apis/services/outgoing/approve:
     put:
       tags:
-        - outgoing-coupons
+        - outgoing-voucher
       summary: '유저가 신청한 놀러가기 서비스를 승인합니다.'
       description: '유저가 신청한 놀러가기 서비스를 승인합니다.'
       operationId: 'approve'
@@ -165,10 +165,49 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Result'
+  /apis/services/outgoing/approves:
+    delete:
+      tags:
+        - outgoing-voucher
+      summary: '승인된 놀러가기를 취소 처리 합니다.'
+      description: '승인된 놀러가기를 취소 처리 합니다.'
+      operationId: 'cancel'
+      parameters:
+        - in: query
+          name: v
+          description: version
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: outgoingServiceId
+          description: voucherId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: '데이터 전송 성공'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+        '400':
+          description: '입력이 유효하지 않습니다'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+        '500':
+          description: '시스템 에러가 발생했습니다'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
   /apis/services/outgoing/reject:
     put:
       tags:
-        - outgoing-coupons
+        - outgoing-voucher
       summary: '유저가 신청한 놀러가기 서비스가 실패할 경우 사용됩니다.'
       description: '유저가 신청한 놀러가기 서비스가 실패할 경우 사용됩니다.'
       operationId: 'reject'
@@ -205,13 +244,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Result'
-  /apis/services/outgoing/coupons:
+  /apis/services/outgoing/vouchers:
     get:
       tags:
-        - outgoing-coupons
-      summary: '유저의 사용가능한 무료 놀러가기 쿠폰을 조회합니다.'
-      description: '유저의 사용가능한 무료 놀러가기 쿠폰을 조회합니다.'
-      operationId: 'getOutgoingCoupons'
+        - outgoing-voucher
+      summary: '유저의 사용가능한 무료 놀러가기 바우처를 조회합니다.'
+      description: '유저의 사용가능한 무료 놀러가기 바우처를 조회합니다.'
+      operationId: 'getOutgoingVouchers'
       parameters:
         - in: query
           name: userId
@@ -232,7 +271,8 @@ paths:
             application/json:
               schema:
                 type: array
-                default: []
+                items:
+                  $ref: '#/components/schemas/OutgoingVoucher'
         '400':
           description: '입력이 유효하지 않습니다'
           content:
@@ -248,7 +288,7 @@ paths:
   /apis/services/outgoing/confirms:
     post:
       tags:
-        - outgoing-coupons
+        - outgoing-voucher
       summary: '승인된 놀러가기를 최종확인 처리 합니다.'
       description: '승인된 놀러가기를 최종확인 처리 합니다.'
       operationId: 'confirm'
@@ -286,45 +326,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/Result'
 
-    delete:
-      tags:
-        - outgoing-coupons
-      summary: '승인된 놀러가기를 취소 처리 합니다.'
-      description: '승인된 놀러가기를 취소 처리 합니다.'
-      operationId: 'cancel'
-      parameters:
-        - in: query
-          name: v
-          description: version
-          required: true
-          schema:
-            type: string
-        - in: query
-          name: outgoingServiceId
-          description: couponId
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: '데이터 전송 성공'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Result'
-        '400':
-          description: '입력이 유효하지 않습니다'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Result'
-        '500':
-          description: '시스템 에러가 발생했습니다'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Result'
-
 components:
   schemas:
     OutgoingServiceRequest:
@@ -337,7 +338,7 @@ components:
           type: string
           example: 1234
 
-    OutgoingCoupon:
+    OutgoingVoucher:
       type: object
       required:
         - id
@@ -387,13 +388,13 @@ components:
     OutgoingServiceConfirmRequest:
       type: 'object'
       properties:
-        outgoingserviceId:
+        outgoingServiceId:
           type: string
           example: 1267512764128
         paymentType:
           type: string
           example: '현장결제 / 쿠폰'
-        usedCouponId:
+        usedVoucherId:
           type: string
           example: '12312427713'
         paymentPrice:
